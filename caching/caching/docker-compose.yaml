@@ -1,0 +1,29 @@
+version: '3.3'
+
+services:
+  spring-boot-caching-api:
+    image: 'spring-boot-caching-api'
+    ports:
+      - "8000:8000"
+    build:
+      context: .
+    container_name: spring-boot-caching-api
+    depends_on:
+      - spring-boot-caching-api-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://spring-boot-caching-api-db:5432/compose-postgres
+      - SPRING_DATASOURCE_USERNAME=compose-postgres
+      - SPRING_DATASOURCE_PASSWORD=compose-postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    volumes:
+      -  /home/volumes/spring_storage
+
+  spring-boot-caching-api-db:
+    image: 'postgres:13.1-alpine'
+    ports:
+      - "5432:5432"
+    container_name: spring-boot-caching-api-db
+    environment:
+      - POSTGRES_USER=compose-postgres
+      - POSTGRES_PASSWORD=compose-postgres
+
