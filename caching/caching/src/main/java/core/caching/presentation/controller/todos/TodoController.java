@@ -30,10 +30,10 @@ public class TodoController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<?> findById(Long id){
+    public ResponseEntity<?> findById(String id){
         try{
             return ResponseEntity.ok(
-                    todoService.findById(id));
+                    todoRepository.findById(id));
         }catch (Exception ex){
             return new ResponseEntity<>(
                     ex.getMessage(), HttpStatus.BAD_REQUEST);
@@ -41,7 +41,7 @@ public class TodoController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<?> deleteById(Long id){
+    public ResponseEntity<?> deleteById(String id){
         try{
             todoRepository.deleteById(id);
             return ResponseEntity.ok(true);

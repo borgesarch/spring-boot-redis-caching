@@ -4,10 +4,12 @@ import core.caching.domain.todos.Todo;
 import core.caching.infrastructure.repositories.todos.ITodoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Service
@@ -16,34 +18,20 @@ public class TodoService implements ITodoService{
     @Autowired
     private ITodoRepository todoRepository;
 
-    @Autowired
-    private RedisTemplate<Long, Todo> redisTemplate;
-
-    @Override
+    @Cacheable(cacheNames = "todo", key="#root.method.name")
     public List<Todo> findAll() {
         return todoRepository.findAll();
     }
 
     @Override
-    @Cacheable(value = "todos", key = "#id")
-    public Todo findById(Long id) {
-        return redisTemplate.opsForValue()
-                .get(id);
-    }
-
-    @Override
+    @CacheEvict(cacheNames = "todo", allEntries = true)
     public Todo save(Todo todo) {
-        Todo todoSaved = todoRepository.save(todo);
-        redisTemplate.opsForValue().set(todoSaved.getId(), todoSaved);
-        return redisTemplate.opsForValue()
-                .get(todoSaved.getId());
+        return todoRepository.save(todo);
     }
 
     @Override
-    public Todo update(Todo todo) {
-        Todo todoSaved = todoRepository.save(todo);
-        redisTemplate.opsForValue().set(todoSaved.getId(), todo);
-        return redisTemplate.opsForValue()
-                .get(todoSaved.getId());
+    @CachePut(cacheNames = "todo", key="#todo.getId()")
+    public Todo update(final Todo todo) {
+        return todoRepository.save(todo);
     }
 }

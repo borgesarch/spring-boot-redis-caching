@@ -6,7 +6,7 @@ plugins {
 
 group = 'core'
 version = ''
-sourceCompatibility = '11'
+sourceCompatibility = '15'
 
 repositories {
 	mavenCentral()
